@@ -1,0 +1,139 @@
+scriptencoding utf-8
+" 日本語ファイル
+
+let s:save_cpo = &cpo
+set cpo&vim
+
+" s:alarm_dicts is a list of dictionary which has
+"   'name' 'time' 'action'
+let s:alarm_dicts = []
+
+" s:flag_enable is true if alarm#enable() is called
+let s:flag_enable = 0
+
+let g:alarm_debug = get(g:, 'alarm_debug', 0)
+
+function! s:default_match(dic, now) " {{{
+  let time = strftime("%y%m%d%H%M", a:now)
+
+  let a:dic.check = time
+
+  if a:dic.next <= time
+    return 1
+  endif
+
+  return 0
+endfunction " }}}
+
+function! s:default_action(dic) " {{{
+  echohl ErrorMsg
+  echo "alarm: " . a:dic.message
+  echohl NoNe
+endfunction " }}}
+
+let s:default_alarm = {
+\   'match' : function("s:default_match"),
+\   'action' : function("s:default_action"),
+\}
+
+function! alarm#enable() " {{{
+  augroup vimalarm
+    autocmd!
+    autocmd CursorHold,CursorHoldI * call s:alarm()
+  augroup END
+  let s:flag_enable = 1
+endfunction " }}}
+
+function! alarm#disable() " {{{
+  augroup vimalarm
+    autocmd!
+  augroup END
+  let s:flag_enable = 0
+endfunction " }}}
+
+function! alarm#is_enabled() " {{{
+  return s:flag_enable
+endfunction " }}}
+
+function! alarm#register(dict) " {{{
+  if type(a:dict) != type({}) ||
+  \  !has_key(a:dict, "name") ||
+  \  !has_key(a:dict, "time")
+    throw "alarm#register(): invalid"
+  endif
+
+  " 上書き
+  call alarm#unregister(a:dict.name)
+
+  " デフォルト値設定
+  let dict = copy(a:dict)
+  let dict = extend(dict, s:default_alarm, 'keep')
+  if type(dict.action) != type([])
+    let dict.action = [dict.action]
+  endif
+  if !has_key(dict, 'message')
+    let dict.message = dict.name
+  endif
+  let dict.prev = localtime()
+  let time = strftime("%H%M", dict.prev)
+  if time >= dict.time
+    " 明日
+    let dict.next = strftime("%y%m%d", dict.prev + 24*60*60) . dict.time
+  else
+    " 今日
+    let dict.next = strftime("%y%m%d", dict.prev) . dict.time
+  endif
+
+  call add(s:alarm_dicts, dict)
+  call sort(s:alarm_dicts, 's:compare')
+endfunction " }}}
+
+function! alarm#unregister(name) " {{{
+  call filter(s:alarm_dicts, 'v:val.name !=#' . string(a:name))
+endfunction " }}}
+
+function! s:compare(a1, a2)  " {{{
+  return a:a1.time - a:a2.time
+endfunction " }}}
+
+function! s:alarm() " {{{
+  " 時刻チェック
+  let now = localtime()
+  for s in s:alarm_dicts
+    if s.match(s, now)
+      call s:action(s, now)
+    endif
+  endfor
+endfunction " }}}
+
+function! alarm#alarm()
+  call s:alarm()
+endfunction
+
+" @vimlint(EVL102, 1, l:A)
+function! s:action(dic, now)
+  for A in a:dic.action
+    call A(a:dic)
+  endfor
+
+  let a:dic.prev = a:now
+  let a:dic.next = strftime("%y%m%d", a:now + 24*60*60) . a:dic.time
+endfunction
+" @vimlint(EVL102, 0, l:A)
+
+if g:alarm_debug " {{{
+
+function! alarm#get_alarm(name)
+  for s in s:alarm_dicts
+    if s.name ==# a:name
+      return s
+    endif
+  endfor
+endfunction
+
+endif " }}}
+
+let &cpo = s:save_cpo
+unlet s:save_cpo
+
+" vim:set et ts=2 sts=2 sw=2 tw=0 foldmethod=marker commentstring=\ "\ %s:
