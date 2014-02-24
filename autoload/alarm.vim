@@ -19,9 +19,24 @@ function! s:default_match(dic, now) " {{{
   return a:dic.next_time <= time
 endfunction " }}}
 
+" 次に鳴らすタイミングを計算する.
+" @return 数値で YYMMDDHHMM の形式
+function! s:default_next(dic, now) " {{{
+  let time = strftime("%H%M", a:now)
+  if time >= a:dic.time
+    " 明日
+    let next = strftime("%y%m%d", a:now + 24*60*60) . a:dic.time
+  else
+    " 今日
+    let next = strftime("%y%m%d", a:now) . a:dic.time
+  endif
+  return next
+endfunction " }}}
+
 let s:default_alarm = {
 \   'match' : function("s:default_match"),
 \   'action' : function("alarm#action#echo"),
+\   'next' : function("s:default_next"),
 \}
 
 function! alarm#enable() " {{{
@@ -101,15 +116,8 @@ function! alarm#register(dict) " {{{
   if !has_key(dict, 'message')
     let dict.message = dict.name
   endif
-  let now = localtime()
-  let time = strftime("%H%M", now)
-  if time >= dict.time
-    " 明日
-    let dict.next_time = strftime("%y%m%d", now + 24*60*60) . dict.time
-  else
-    " 今日
-    let dict.next_time = strftime("%y%m%d", now) . dict.time
-  endif
+
+  let dict.next_time = dict.next(dict, localtime())
 
   call add(s:alarm_dicts, dict)
   call sort(s:alarm_dicts, 's:compare')
@@ -146,7 +154,7 @@ function! s:action(dic, now) " {{{
     call A(a:dic)
   endfor
 
-  let a:dic.next_time = strftime("%y%m%d", a:now + 24*60*60) . a:dic.time
+  let a:dic.next_time = a:dic.next(a:dic, a:now)
 endfunction " }}}
 " @vimlint(EVL102, 0, l:A)
 
