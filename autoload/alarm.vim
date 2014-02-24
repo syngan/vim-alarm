@@ -44,6 +44,7 @@ function! alarm#is_enabled() " {{{
 endfunction " }}}
 
 function! alarm#register(dict) " {{{
+  " 入力チェック.
   if type(a:dict) != type({}) ||
   \  !has_key(a:dict, "name") ||
   \  !has_key(a:dict, "time")
@@ -125,10 +126,6 @@ function! s:alarm() " {{{
       call s:action(s, now)
     endif
   endfor
-endfunction " }}}
-
-function! alarm#alarm() " {{{
-  call s:alarm()
 endfunction " }}}
 
 " @vimlint(EVL102, 1, l:A)
