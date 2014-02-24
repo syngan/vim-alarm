@@ -101,14 +101,14 @@ function! alarm#register(dict) " {{{
   if !has_key(dict, 'message')
     let dict.message = dict.name
   endif
-  let dict.prev = localtime()
-  let time = strftime("%H%M", dict.prev)
+  let now = localtime()
+  let time = strftime("%H%M", now)
   if time >= dict.time
     " 明日
-    let dict.next = strftime("%y%m%d", dict.prev + 24*60*60) . dict.time
+    let dict.next = strftime("%y%m%d", now + 24*60*60) . dict.time
   else
     " 今日
-    let dict.next = strftime("%y%m%d", dict.prev) . dict.time
+    let dict.next = strftime("%y%m%d", now) . dict.time
   endif
 
   call add(s:alarm_dicts, dict)
@@ -134,7 +134,6 @@ function! s:action(dic, now) " {{{
     call A(a:dic)
   endfor
 
-  let a:dic.prev = a:now
   let a:dic.next = strftime("%y%m%d", a:now + 24*60*60) . a:dic.time
 endfunction " }}}
 " @vimlint(EVL102, 0, l:A)
