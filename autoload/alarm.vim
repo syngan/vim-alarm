@@ -15,14 +15,8 @@ let g:alarm_debug = get(g:, 'alarm_debug', 0)
 
 function! s:default_match(dic, now) " {{{
   let time = strftime("%y%m%d%H%M", a:now)
-
-  let a:dic.check = time
-
-  if a:dic.next <= time
-    return 1
-  endif
-
-  return 0
+  let a:dic.check = time " for debug: unused
+  return a:dic.next <= time
 endfunction " }}}
 
 function! s:default_action(dic) " {{{
