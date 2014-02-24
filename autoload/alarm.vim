@@ -61,20 +61,20 @@ function! alarm#register(dict) " {{{
   else
     let action = dict.action
   endif
+
+  " アクションの変換.
   let dict.action = []
   for A in action
     if type(A) == type("")
-      if A ==# 'mail'
-        unlet A
-        let A = function('alarm#action#mail')
-      elseif A ==# 'echo'
-        unlet A
-        let A = function('alarm#action#echo')
-      elseif A ==# 'beep'
-        unlet A
-        let A = function('alarm#action#beep')
-      else
-        throw "alarm#register() : unknown feauture"
+      for f in ['mail', 'echo', 'beep', 'notify' ]
+        if A ==# f
+          unlet A
+          let A = function('alarm#action#' . f)
+          break
+        endif
+      endfor
+      if type(A) == type("")
+        throw "alarm#register() : unknown action type"
       endif
     elseif type(A) != type(function('tr'))
       throw "alarm#register() : invalid action: " . string(A)
