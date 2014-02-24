@@ -111,15 +111,10 @@ function! alarm#register(dict) " {{{
   endif
 
   call add(s:alarm_dicts, dict)
-  call sort(s:alarm_dicts, 's:compare')
 endfunction " }}}
 
 function! alarm#unregister(name) " {{{
   call filter(s:alarm_dicts, 'v:val.name !=#' . string(a:name))
-endfunction " }}}
-
-function! s:compare(a1, a2)  " {{{
-  return a:a1.time - a:a2.time
 endfunction " }}}
 
 function! s:alarm() " {{{
