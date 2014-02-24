@@ -109,6 +109,16 @@ function! s:action(dic, now)
 endfunction
 " @vimlint(EVL102, 0, l:A)
 
+function! alarm#test(name)
+  for s in s:alarm_dicts
+    if s.name ==# a:name
+      call s:action(s, localtime())
+      return
+    endif
+  endfor
+endfunction
+
+
 if g:alarm_debug " {{{
 
 function! alarm#get_alarm(name)
