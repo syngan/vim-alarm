@@ -1,0 +1,82 @@
+alarm.txt 指定した時間にアラームを上げる
+
+==============================================================================
+目次						*alarm-contents*
+
+概要				|alarm-introduction|
+インターフェース		|alarm-interface|
+  関数				  |alarm-functions|
+  アクション			  |alarm-action|
+更新履歴			|alarm-changelog|
+
+==============================================================================
+概要						*alarm-introduction*
+
+*alarm.vim* は指定した時刻にアラームを上げます。
+
+
+動作確認環境
+- Vim 7.4 + Ubuntu 12.04
+
+最新版:
+https://github.com/syngan/vim-alarm/
+
+==============================================================================
+インターフェース				*alarm-interface*
+
+------------------------------------------------------------------------------
+関数						*alarm-functions*
+
+alarm#enable()					*alarm#enable()*
+	alarm.vim を有効にします。
+
+alarm#disable()					*alarm#disable()*
+	alarm.vim を無効にします。
+
+alarm#is_enabled()				*alarm#is_enabled()*
+	alarm.vim が有効なら 0 以外を返します。そうでなければ 0 を返します。
+
+alarm#register({dict})				*alarm#register()*
+	alarm を登録します。{dict} は辞書型で以下のキーを持ちます。
+	'name' : ユーザが自由につける文字列で指定された名前 (必須)
+	'time' : アラームを実行する 4 桁の数値で指定される時刻 (必須)
+	'action' : 実行するアラームの種類。文字列または |Funcref|
+	またはそれらのリストを指定します。省略時は 'echo'
+	が使用されます。詳細は |alarm-action| 参照。
+	'message' : アラーム時に表示する文字列メッセージ。省略された場合に
+	は 'name' が使用されます。 (任意)
+
+alarm#unregister({name})			*alarm#unregister()*
+	{name} で登録されたアラームを削除します。
+
+alarm#test({name})				*alarm#test()*
+	alarm の動作を確認します。
+
+==============================================================================
+アクション					*alarm-action*
+
+デフォルトでは以下のアクションを使用できます。
+
+'echo'						*alarm-action-echo*
+	echo します。
+
+'beep'	(has('lua'))				*alarm-action-beep*
+	beep 音を鳴らします。
+
+'notify'					*alarm-action-notify*
+	|alarm#register()| で登録時の {dict} にて
+	'notify': 通知に利用するコマンド。省略時は 'notify-send'
+
+'mail'	(has('python'))				*alarm-action-mail*
+	|alarm#register()| で登録時の {dict} にて
+	'email' : 送信元および送信先の email アドレス (必須)
+	'smtp_host' : 使用する SMTP のホスト名 (必須)
+	'smtp_port' : 使用する SMTP のポート番号 (任意、省略時は 25)
+	'smtp_user' : 認証が必要な場合のユーザ名 (任意)
+	'smtp_pass' : 認証が必要な場合のパスワード (任意)
+
+ユーザが定義した |Funcref| を指定することもできます。
+action({dict}). {dict} は |alarm#register()| で指定されたものです。
+
+==============================================================================
+vim:tw=78:fo=tcq2mM:ts=8:ft=help:norl
