@@ -112,7 +112,12 @@ function! alarm#register(dict) " {{{
   endif
 
   call add(s:alarm_dicts, dict)
+  call sort(s:alarm_dicts, 's:compare')
 endfunction " }}}
+
+function! s:compare(a1, a2)
+  return a:a1.next - a:a2.next
+endfunction
 
 function! alarm#unregister(name) " {{{
   call filter(s:alarm_dicts, 'v:val.name !=#' . string(a:name))
@@ -124,6 +129,8 @@ function! s:alarm() " {{{
   for s in s:alarm_dicts
     if s.match(s, now)
       call s:action(s, now)
+    else
+      break
     endif
   endfor
 endfunction " }}}
