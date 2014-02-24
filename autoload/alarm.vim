@@ -57,8 +57,46 @@ function! alarm#register(dict) " {{{
   let dict = copy(a:dict)
   let dict = extend(dict, s:default_alarm, 'keep')
   if type(dict.action) != type([])
-    let dict.action = [dict.action]
+    let action = [dict.action]
+  else
+    let action = dict.action
   endif
+  let dict.action = []
+  for A in action
+    if type(A) == type("")
+      if A ==# 'mail'
+        unlet A
+        let A = function('alarm#action#mail')
+      elseif A ==# 'echo'
+        unlet A
+        let A = function('alarm#action#echo')
+      elseif A ==# 'beep'
+        unlet A
+        let A = function('alarm#action#beep')
+      else
+        throw "alarm#register() : unknown feauture"
+      endif
+    elseif type(A) != type(function('tr'))
+      throw "alarm#register() : invalid action: " . string(A)
+    endif
+    call add(dict.action, A)
+    unlet A
+  endfor
+
+  for A in dict.action
+    if !exists('*' . string(A))
+      throw "alarm#register() : unknown action: " . string(A)
+    endif
+
+    if A == function('alarm#action#mail')
+      for key in ['email', 'smtp_host']
+        if !has_key(dict, key)
+          throw "alarm#register() : key not present in dictionary: " . key
+        endif
+      endfor
+    endif
+  endfor
+
   if !has_key(dict, 'message')
     let dict.message = dict.name
   endif
