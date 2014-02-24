@@ -16,7 +16,7 @@ let g:alarm_debug = get(g:, 'alarm_debug', 0)
 function! s:default_match(dic, now) " {{{
   let time = strftime("%y%m%d%H%M", a:now)
   let a:dic.check = time " for debug: unused
-  return a:dic.next <= time
+  return a:dic.next_time <= time
 endfunction " }}}
 
 let s:default_alarm = {
@@ -105,10 +105,10 @@ function! alarm#register(dict) " {{{
   let time = strftime("%H%M", now)
   if time >= dict.time
     " 明日
-    let dict.next = strftime("%y%m%d", now + 24*60*60) . dict.time
+    let dict.next_time = strftime("%y%m%d", now + 24*60*60) . dict.time
   else
     " 今日
-    let dict.next = strftime("%y%m%d", now) . dict.time
+    let dict.next_time = strftime("%y%m%d", now) . dict.time
   endif
 
   call add(s:alarm_dicts, dict)
@@ -116,7 +116,7 @@ function! alarm#register(dict) " {{{
 endfunction " }}}
 
 function! s:compare(a1, a2)
-  return a:a1.next - a:a2.next
+  return a:a1.next_time - a:a2.next_time
 endfunction
 
 function! alarm#unregister(name) " {{{
@@ -141,7 +141,7 @@ function! s:action(dic, now) " {{{
     call A(a:dic)
   endfor
 
-  let a:dic.next = strftime("%y%m%d", a:now + 24*60*60) . a:dic.time
+  let a:dic.next_time = strftime("%y%m%d", a:now + 24*60*60) . a:dic.time
 endfunction " }}}
 " @vimlint(EVL102, 0, l:A)
 
