@@ -126,13 +126,18 @@ endfunction " }}}
 function! s:alarm() " {{{
   " 時刻チェック
   let now = localtime()
+  let flag = 0
   for s in s:alarm_dicts
     if s.match(s, now)
       call s:action(s, now)
+      let flag = 1
     else
       break
     endif
   endfor
+  if flag
+    call sort(s:alarm_dicts, 's:compare')
+  endif
 endfunction " }}}
 
 " @vimlint(EVL102, 1, l:A)
@@ -149,6 +154,7 @@ function! alarm#test(name) " {{{
   for s in s:alarm_dicts
     if s.name ==# a:name
       call s:action(s, localtime())
+      call sort(s:alarm_dicts, 's:compare')
       return
     endif
   endfor
