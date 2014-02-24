@@ -121,9 +121,15 @@ endfunction
 
 if g:alarm_debug " {{{
 
-function! alarm#get_alarm(name)
+function! alarm#get_alarm(...)
+
+  if a:0 == 0
+    return map(copy(s:alarm_dicts), 'v:val.name')
+  endif
+
+  let name = a:1
   for s in s:alarm_dicts
-    if s.name ==# a:name
+    if s.name ==# name
       return s
     endif
   endfor
