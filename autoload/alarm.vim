@@ -132,30 +132,29 @@ function! s:alarm() " {{{
   endfor
 endfunction " }}}
 
-function! alarm#alarm()
+function! alarm#alarm() " {{{
   call s:alarm()
-endfunction
+endfunction " }}}
 
 " @vimlint(EVL102, 1, l:A)
-function! s:action(dic, now)
+function! s:action(dic, now) " {{{
   for A in a:dic.action
     call A(a:dic)
   endfor
 
   let a:dic.prev = a:now
   let a:dic.next = strftime("%y%m%d", a:now + 24*60*60) . a:dic.time
-endfunction
+endfunction " }}}
 " @vimlint(EVL102, 0, l:A)
 
-function! alarm#test(name)
+function! alarm#test(name) " {{{
   for s in s:alarm_dicts
     if s.name ==# a:name
       call s:action(s, localtime())
       return
     endif
   endfor
-endfunction
-
+endfunction " }}}
 
 if g:alarm_debug " {{{
 

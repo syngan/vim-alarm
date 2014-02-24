@@ -61,6 +61,19 @@ endpython
 endfunction " }}}
 endif
 
+function! alarm#action#notify(dic)
+  if !has_key(a:dic, 'notify')
+    let a:dic.notify = 'notify-send'
+  endif
+  try
+    call vimproc#version()
+    call vimproc#system_bg(a:dic.notify .' '. a:dic.message)
+  catch
+    call system(a:dic.notify .' '. a:dic.message)
+  endtry
+endfunction
+
+
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
