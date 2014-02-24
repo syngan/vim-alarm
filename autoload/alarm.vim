@@ -13,7 +13,7 @@ let s:flag_enable = 0
 
 let g:alarm_debug = get(g:, 'alarm_debug', 0)
 
-function! s:default_match(dic, now) " {{{
+function! s:match(dic, now) " {{{
   let time = strftime("%y%m%d%H%M", a:now)
   let a:dic.check = time " for debug: unused
   return a:dic.next_time <= time
@@ -34,7 +34,6 @@ function! s:default_next(dic, now) " {{{
 endfunction " }}}
 
 let s:default_alarm = {
-\   'match' : function("s:default_match"),
 \   'action' : function("alarm#action#echo"),
 \   'next' : function("s:default_next"),
 \}
@@ -136,7 +135,7 @@ function! s:alarm() " {{{
   let now = localtime()
   let flag = 0
   for s in s:alarm_dicts
-    if s.match(s, now)
+    if s:match(s, now)
       call s:action(s, now)
       let flag = 1
     else

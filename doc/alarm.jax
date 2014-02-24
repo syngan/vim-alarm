@@ -45,7 +45,6 @@ alarm#register({dict})				*alarm#register()*
 	'action' : 実行するアラームの種類。文字列または |Funcref|
 	またはそれらのリストを指定します。省略時は 'echo'
 	が使用されます。詳細は |alarm-action| 参照。
-	'match' : アラームを鳴らす判定。|Funcref| (任意)
 	'next' : 次にアラームを鳴らす時刻を返す |Funcref| (任意)
 	'message' : アラーム時に表示する文字列メッセージ。省略された場合に
 	は 'name' が使用されます。 (任意)
