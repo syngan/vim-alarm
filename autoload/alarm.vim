@@ -19,15 +19,9 @@ function! s:default_match(dic, now) " {{{
   return a:dic.next <= time
 endfunction " }}}
 
-function! s:default_action(dic) " {{{
-  echohl ErrorMsg
-  echo "alarm: " . a:dic.message
-  echohl NoNe
-endfunction " }}}
-
 let s:default_alarm = {
 \   'match' : function("s:default_match"),
-\   'action' : function("s:default_action"),
+\   'action' : function("alarm#action#echo"),
 \}
 
 function! alarm#enable() " {{{
