@@ -57,6 +57,7 @@ alarm#test({name})				*alarm#test()*
 アクション					*alarm-action*
 
 デフォルトでは以下のアクションを使用できます。
+永続的な通知方法でメール以外のものがほしい。
 
 'echo'						*alarm-action-echo*
 	echo します。
@@ -64,17 +65,22 @@ alarm#test({name})				*alarm#test()*
 'beep'	(has('lua'))				*alarm-action-beep*
 	beep 音を鳴らします。
 
+'buffer'					*alarm-action-buffer*
+	新しいバッファを開いてそこに出力します。
+
 'notify'					*alarm-action-notify*
 	|alarm#register()| で登録時の {dict} にて
 	'notify': 通知に利用するコマンド。省略時は 'notify-send'
 
 'mail'	(has('python'))				*alarm-action-mail*
+	メールを送信します。
 	|alarm#register()| で登録時の {dict} にて
 	'email' : 送信元および送信先の email アドレス (必須)
 	'smtp_host' : 使用する SMTP のホスト名 (必須)
 	'smtp_port' : 使用する SMTP のポート番号 (任意、省略時は 25)
 	'smtp_user' : 認証が必要な場合のユーザ名 (任意)
 	'smtp_pass' : 認証が必要な場合のパスワード (任意)
+
 
 ユーザが定義した |Funcref| を指定することもできます。
 action({dict}). {dict} は |alarm#register()| で指定されたものです。

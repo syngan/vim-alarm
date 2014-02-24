@@ -67,7 +67,7 @@ function! alarm#register(dict) " {{{
   let dict.action = []
   for A in action
     if type(A) == type("")
-      for f in ['mail', 'echo', 'beep', 'notify' ]
+      for f in ['mail', 'echo', 'beep', 'notify', 'buffer']
         if A ==# f
           unlet A
           let A = function('alarm#action#' . f)

@@ -61,7 +61,7 @@ endpython
 endfunction " }}}
 endif
 
-function! alarm#action#notify(dic)
+function! alarm#action#notify(dic) " {{{
   if !has_key(a:dic, 'notify')
     let a:dic.notify = 'notify-send'
   endif
@@ -71,8 +71,15 @@ function! alarm#action#notify(dic)
   catch
     call system(a:dic.notify .' '. a:dic.message)
   endtry
-endfunction
+endfunction " }}}
 
+function! alarm#action#buffer(dic) " {{{
+  execute 'new'
+  silent 0put ='time: ' . strftime('%y/%m/%d %H:%M')
+  silent $put ='name: ' . a:dic.name
+  silent $put ='message: ' . a:dic.message
+  setlocal nomodified nomodifiable readonly
+endfunction " }}}
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
