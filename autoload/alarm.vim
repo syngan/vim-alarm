@@ -58,15 +58,13 @@ function! alarm#is_enabled() " {{{
 endfunction " }}}
 
 function! alarm#register(dict) " {{{
-  " 入力チェック.
+  " 入力チェックはしっかりやる.
   if type(a:dict) != type({}) ||
-  \  !has_key(a:dict, "name") ||
-  \  !has_key(a:dict, "time")
-    throw "alarm#register(): invalid"
+  \  !has_key(a:dict, 'name') ||
+  \  !has_key(a:dict, 'time')
+    throw 'alarm#register(): invalid'
   endif
 
-  " 上書き
-  call alarm#unregister(a:dict.name)
 
   " デフォルト値設定
   let dict = copy(a:dict)
@@ -118,16 +116,17 @@ function! alarm#register(dict) " {{{
 
   let dict.next_time = dict.next(dict, localtime())
 
+  call alarm#unregister(a:dict.name)
   call add(s:alarm_dicts, dict)
   call sort(s:alarm_dicts, 's:compare')
 endfunction " }}}
 
-function! s:compare(a1, a2)
-  return a:a1.next_time - a:a2.next_time
-endfunction
-
 function! alarm#unregister(name) " {{{
   call filter(s:alarm_dicts, 'v:val.name !=#' . string(a:name))
+endfunction " }}}
+
+function! s:compare(a1, a2) " {{{
+  return a:a1.next_time - a:a2.next_time
 endfunction " }}}
 
 function! s:alarm() " {{{
