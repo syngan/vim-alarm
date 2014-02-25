@@ -3,12 +3,14 @@ scriptencoding utf-8
 let s:save_cpo = &cpo
 set cpo&vim
 
-" s:alarm_dicts is a list of dictionary which has
-"   'name' 'time' 'action'
+" s:alarm_dicts is a list of dictionary
+" @see alarm#register()
 let s:alarm_dicts = []
 
 " s:flag_enable is true if alarm#enable() is called
 let s:flag_enable = 0
+
+"let s:counter = 0
 
 let g:alarm_debug = get(g:, 'alarm_debug', 0)
 
@@ -125,6 +127,8 @@ endfunction " }}}
 function! s:alarm() " {{{
   " 時刻チェック
   let now = localtime()
+"  let s:counter += 1
+"  redraw | echo "alarm: " . s:counter .  ": " . now
   let flag = 0
   for s in s:alarm_dicts
     if s:match(s, now)
@@ -137,6 +141,8 @@ function! s:alarm() " {{{
   if flag
     call sort(s:alarm_dicts, 's:compare')
   endif
+  " @see http://d.hatena.ne.jp/osyo-manga/20121102/1351836801
+  call feedkeys(mode() ==# 'i' ? "\<C-g>\<ESC>" : "g\<ESC>", 'n')
 endfunction " }}}
 
 function! s:match(dic, now) " {{{
