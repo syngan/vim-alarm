@@ -52,14 +52,23 @@ function! alarm#is_enabled() " {{{
   return s:flag_enable
 endfunction " }}}
 
+function! s:input_check(dict, keys) " {{{
+  let keys = type(a:keys) == type([]) ? a:keys : [a:keys]
+  for k in keys
+    if !has_key(a:dict, k)
+      throw 'alarm#register(): key not present in dictionary: ' . k
+"      throw 'alarm#register(): ''' . k . ''' is required'
+    endif
+  endfor
+endfunction " }}}
+
 function! alarm#register(dict) " {{{
   " 入力チェックはしっかりやる.
-  if type(a:dict) != type({}) ||
-  \  !has_key(a:dict, 'name') ||
-  \  !has_key(a:dict, 'time')
-    throw 'alarm#register(): invalid'
+  if type(a:dict) != type({})
+    throw 'alarm#register(): dictionary is required'
   endif
 
+  call s:input_check(a:dict, 'name')
 
   " デフォルト値設定
   let dict = copy(a:dict)
@@ -69,6 +78,11 @@ function! alarm#register(dict) " {{{
   else
     let action = dict.action
   endif
+
+  if type(dict.set) != type(function('tr'))
+    throw 'alarm#register(): invalid'
+  endif
+
 
   " アクションの変換.
   let dict.action = []
@@ -97,13 +111,13 @@ function! alarm#register(dict) " {{{
     endif
 
     if A == function('alarm#action#mail')
-      for key in ['email', 'smtp_host']
-        if !has_key(dict, key)
-          throw 'alarm#register() : key not present in dictionary: ' . key
-        endif
-      endfor
+      call s:input_check(dict, ['email', 'smtp_host'])
     endif
   endfor
+
+  if dict.set == function('s:default_set')
+    call s:input_check(dict, 'time')
+  endif
 
   if !has_key(dict, 'message')
     let dict.message = dict.name
@@ -111,7 +125,7 @@ function! alarm#register(dict) " {{{
 
   let dict.next_time = dict.set(dict, localtime())
 
-  call alarm#unregister(a:dict.name)
+  call alarm#unregister(dict.name)
   call add(s:alarm_dicts, dict)
   call sort(s:alarm_dicts, 's:compare')
 endfunction " }}}
