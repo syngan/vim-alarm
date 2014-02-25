@@ -1,7 +1,10 @@
-scriptencoding utf-8
-
 let s:save_cpo = &cpo
 set cpo&vim
+
+scriptencoding utf-8
+
+" s:action() 後, 正確には next_time 更新後には,
+" 必ず sort() やらないといけないことに注意.
 
 " s:alarm_dicts is a list of dictionary
 " @see alarm#register()
@@ -80,7 +83,7 @@ function! alarm#register(dict) " {{{
   endif
 
   if type(dict.set) != type(function('tr'))
-    throw 'alarm#register(): invalid'
+    throw 'alarm#register(): invalid set type'
   endif
 
 
@@ -96,7 +99,7 @@ function! alarm#register(dict) " {{{
         endif
       endfor
       if type(A) == type("")
-        throw 'alarm#register() : unknown action type'
+        throw 'alarm#register() : unknown action'
       endif
     elseif type(A) != type(function('tr'))
       throw 'alarm#register() : invalid action: ' . string(A)
@@ -155,6 +158,8 @@ function! s:alarm() " {{{
   if flag
     call sort(s:alarm_dicts, 's:compare')
   endif
+
+  " 放置中に CursorHold を再度発生させるため
   " @see http://d.hatena.ne.jp/osyo-manga/20121102/1351836801
   call feedkeys(mode() ==# 'i' ? "\<C-g>\<ESC>" : "g\<ESC>", 'n')
 endfunction " }}}
