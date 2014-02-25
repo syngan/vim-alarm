@@ -46,6 +46,8 @@ alarm#register({dict})				*alarm#register()*
 	またはそれらのリストを指定します。省略時は 'echo'
 	が使用されます。詳細は |alarm-action| 参照。
 	'next' : 次にアラームを鳴らす時刻を返す |Funcref| (任意)
+	デフォルトでは当日または翌日の time 時間を返す。
+	(近いうちに week/date に依存させる)
 	'message' : アラーム時に表示する文字列メッセージ。省略された場合に
 	は 'name' が使用されます。 (任意)
 
@@ -59,7 +61,6 @@ alarm#test({name})				*alarm#test()*
 アクション					*alarm-action*
 
 デフォルトでは以下のアクションを使用できます。
-永続的な通知方法でメール以外のものがほしい。
 
 'echo'						*alarm-action-echo*
 	echo します。

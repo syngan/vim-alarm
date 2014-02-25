@@ -1,5 +1,4 @@
 scriptencoding utf-8
-" 日本語ファイル
 
 let s:save_cpo = &cpo
 set cpo&vim
@@ -12,12 +11,6 @@ let s:alarm_dicts = []
 let s:flag_enable = 0
 
 let g:alarm_debug = get(g:, 'alarm_debug', 0)
-
-function! s:match(dic, now) " {{{
-  let time = strftime("%y%m%d%H%M", a:now)
-  let a:dic.check = time " for debug: unused
-  return a:dic.next_time <= time
-endfunction " }}}
 
 " 次に鳴らすタイミングを計算する.
 " @return 数値で YYMMDDHHMM の形式
@@ -34,8 +27,8 @@ function! s:default_next(dic, now) " {{{
 endfunction " }}}
 
 let s:default_alarm = {
-\   'action' : function("alarm#action#echo"),
-\   'next' : function("s:default_next"),
+\   'action' : function('alarm#action#echo'),
+\   'next' : function('s:default_next'),
 \}
 
 function! alarm#enable() " {{{
@@ -87,10 +80,10 @@ function! alarm#register(dict) " {{{
         endif
       endfor
       if type(A) == type("")
-        throw "alarm#register() : unknown action type"
+        throw 'alarm#register() : unknown action type'
       endif
     elseif type(A) != type(function('tr'))
-      throw "alarm#register() : invalid action: " . string(A)
+      throw 'alarm#register() : invalid action: ' . string(A)
     endif
     call add(dict.action, A)
     unlet A
@@ -98,13 +91,13 @@ function! alarm#register(dict) " {{{
 
   for A in dict.action
     if !exists('*' . string(A))
-      throw "alarm#register() : unknown action: " . string(A)
+      throw 'alarm#register() : unknown action: ' . string(A)
     endif
 
     if A == function('alarm#action#mail')
       for key in ['email', 'smtp_host']
         if !has_key(dict, key)
-          throw "alarm#register() : key not present in dictionary: " . key
+          throw 'alarm#register() : key not present in dictionary: ' . key
         endif
       endfor
     endif
@@ -146,6 +139,12 @@ function! s:alarm() " {{{
   endif
 endfunction " }}}
 
+function! s:match(dic, now) " {{{
+  let time = strftime("%y%m%d%H%M", a:now)
+  let a:dic.check = time " for debug: unused
+  return a:dic.next_time <= time
+endfunction " }}}
+
 " @vimlint(EVL102, 1, l:A)
 function! s:action(dic, now) " {{{
   for A in a:dic.action
@@ -168,8 +167,7 @@ endfunction " }}}
 
 if g:alarm_debug " {{{
 
-function! alarm#get_alarm(...)
-
+function! alarm#get_alarm(...) " {{{
   if a:0 == 0
     return map(copy(s:alarm_dicts), 'v:val.name')
   endif
@@ -180,11 +178,11 @@ function! alarm#get_alarm(...)
       return s
     endif
   endfor
-endfunction
+endfunction " }}}
 
 endif " }}}
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
-" vim:set et ts=2 sts=2 sw=2 tw=0 foldmethod=marker commentstring=\ "\ %s:
+" vim:set et ts=2 sts=2 sw=2 tw=0 fdm=marker cms=\ "\ %s:
