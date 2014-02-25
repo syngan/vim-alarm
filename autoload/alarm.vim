@@ -16,7 +16,7 @@ let g:alarm_debug = get(g:, 'alarm_debug', 0)
 
 " 次に鳴らすタイミングを計算する.
 " @return 数値で YYMMDDHHMM の形式
-function! s:default_next(dic, now) " {{{
+function! s:default_set(dic, now) " {{{
   let time = strftime("%H%M", a:now)
   if time >= a:dic.time
     " 明日
@@ -30,7 +30,7 @@ endfunction " }}}
 
 let s:default_alarm = {
 \   'action' : function('alarm#action#echo'),
-\   'next' : function('s:default_next'),
+\   'set' : function('s:default_set'),
 \}
 
 function! alarm#enable() " {{{
@@ -109,7 +109,7 @@ function! alarm#register(dict) " {{{
     let dict.message = dict.name
   endif
 
-  let dict.next_time = dict.next(dict, localtime())
+  let dict.next_time = dict.set(dict, localtime())
 
   call alarm#unregister(a:dict.name)
   call add(s:alarm_dicts, dict)
@@ -157,7 +157,7 @@ function! s:action(dic, now) " {{{
     call A(a:dic)
   endfor
 
-  let a:dic.next_time = a:dic.next(a:dic, a:now)
+  let a:dic.next_time = a:dic.set(a:dic, a:now)
 endfunction " }}}
 " @vimlint(EVL102, 0, l:A)
 

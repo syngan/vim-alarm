@@ -7,6 +7,7 @@ alarm.txt 指定した時間にアラームを上げる
 インターフェース		|alarm-interface|
   関数				  |alarm-functions|
   アクション			  |alarm-action|
+  アラームのセット		  |alarm-set|
 更新履歴			|alarm-changelog|
 
 ==============================================================================
@@ -39,15 +40,11 @@ alarm#is_enabled()				*alarm#is_enabled()*
 alarm#register({dict})				*alarm#register()*
 	alarm を登録します。{dict} は辞書型で以下のキーを持ちます。
 	'name' : ユーザが自由につける文字列で指定された名前 (必須)
-	'time' : アラームを実行する 4 桁の数値で指定される時刻 (必須)
-	'date' : アラームを実行する日付. 毎日実行する場合は省略 (任意:not yet)
-	'week' : アラームを実行する曜日. 毎日実行する場合は省略 (任意:not yet)
 	'action' : 実行するアラームの種類。文字列または |Funcref|
 	またはそれらのリストを指定します。省略時は 'echo'
 	が使用されます。詳細は |alarm-action| 参照。
-	'next' : 次にアラームを鳴らす時刻を返す |Funcref| (任意)
+	'set' : 次にアラームを鳴らす時刻を返す |Funcref| (任意)
 	デフォルトでは当日または翌日の time 時間を返す。
-	(近いうちに week/date に依存させる)
 	'message' : アラーム時に表示する文字列メッセージ。省略された場合に
 	は 'name' が使用されます。 (任意)
 
@@ -61,6 +58,7 @@ alarm#test({name})				*alarm#test()*
 アクション					*alarm-action*
 
 デフォルトでは以下のアクションを使用できます。
+
 
 'echo'						*alarm-action-echo*
 	echo します。
@@ -87,6 +85,28 @@ alarm#test({name})				*alarm#test()*
 
 ユーザが定義した |Funcref| を指定することもできます。
 action({dict}). {dict} は |alarm#register()| で指定されたものです。
+
+	Example >
+		function! Alarm(dic)
+		    echo a:dic.message
+		endfunction
+		let s:alarm_def = {}
+		let s:alarm_def.name = "ohiru"
+		let s:alarm_def.message= "お昼ごはん食べましたか"
+		let s:alarm_def.time = 1200
+		let s:alarm_def.action = ["buffer", "notify", function("Alarm")]
+		call alarm#register(s:alarm_def)
+	<
+
+==============================================================================
+アラームのセット					*alarm-set*
+
+デフォルトでは以下のアクションを使用できます。
+	(近いうちに week/date に依存させる)
+
+	'time' : アラームを実行する 4 桁の数値で指定される時刻 (必須)
+	'date' : アラームを実行する日付. 毎日実行する場合は省略 (任意:not yet)
+	'week' : アラームを実行する曜日. 毎日実行する場合は省略 (任意:not yet)
 
 ==============================================================================
 vim:tw=78:fo=tcq2mM:ts=8:ft=help:norl
